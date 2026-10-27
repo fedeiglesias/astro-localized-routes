@@ -1,0 +1,22 @@
+---
+import { renderHead } from 'astro-localized-routes';
+import { routing } from '../routing.ts';
+
+const head = routing.resolveHead({
+  lang: 'es',
+  path: '/404/',
+  metadata: { title: 'Página no encontrada', robots: { index: false } },
+});
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <Fragment set:html={renderHead({ head })} />
+  </head>
+  <body data-layout="minimal">
+    <h1>404</h1>
+  </body>
+</html>

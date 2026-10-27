@@ -1,0 +1,75 @@
+---
+import {
+  breadcrumbJsonLd,
+  type RoutePage,
+  renderHead,
+  serializeJsonLd,
+} from 'astro-localized-routes';
+import type { Layout, Locale } from '../routes.ts';
+import { routing } from '../routing.ts';
+
+interface Props {
+  page: RoutePage<Locale, Layout>;
+}
+
+const { page } = Astro.props;
+const menu = await Promise.all(
+  ['home', 'home.services', 'home.about'].map((id) => routing.getPath(id, page.lang)),
+);
+const labels: Record<Locale, string[]> = {
+  es: ['Inicio', 'Servicios', 'Sobre nosotros'],
+  en: ['Home', 'Services', 'About us'],
+  ca: ['Inici', 'Serveis', 'Sobre nosaltres'],
+};
+const breadcrumbList = breadcrumbJsonLd(page);
+---
+
+<!doctype html>
+<html lang={routing.config.hreflang[page.lang]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <Fragment set:html={renderHead(page)} />
+    {
+      breadcrumbList && page.breadcrumbs.length > 1 && (
+        <script type="application/ld+json" set:html={serializeJsonLd(breadcrumbList)} />
+      )
+    }
+  </head>
+  <body data-layout="default">
+    <header>
+      <nav aria-label="Main">
+        {menu.map((href, index) => href && <a href={href}>{labels[page.lang][index]}</a>)}
+      </nav>
+      <nav aria-label="Language">
+        {
+          page.alternates
+            .filter((alternate) => alternate.lang !== page.lang)
+            .map((alternate) => (
+              <a href={new URL(alternate.href).pathname} hreflang={alternate.hreflang}>
+                {alternate.lang}
+              </a>
+            ))
+        }
+      </nav>
+    </header>
+    <nav aria-label="Breadcrumb">
+      <ol>
+        {
+          page.breadcrumbs.map((crumb) => (
+            <li>
+              {crumb.current ? (
+                <span aria-current="page">{crumb.label}</span>
+              ) : (
+                <a href={crumb.href}>{crumb.label}</a>
+              )}
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>

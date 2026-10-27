@@ -1,0 +1,25 @@
+---
+import { type RoutePage, renderHead } from 'astro-localized-routes';
+import type { Layout, Locale } from '../routes.ts';
+import { routing } from '../routing.ts';
+
+interface Props {
+  page: RoutePage<Locale, Layout>;
+}
+
+const { page } = Astro.props;
+---
+
+<!doctype html>
+<html lang={routing.config.hreflang[page.lang]}>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <Fragment set:html={renderHead(page)} />
+  </head>
+  <body data-layout="minimal">
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>

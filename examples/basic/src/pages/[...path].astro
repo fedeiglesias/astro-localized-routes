@@ -1,0 +1,19 @@
+---
+import type { RoutePage } from 'astro-localized-routes';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import MinimalLayout from '../layouts/MinimalLayout.astro';
+import type { Layout, Locale } from '../routes.ts';
+import { routing } from '../routing.ts';
+
+export const getStaticPaths = routing.getStaticPaths;
+
+type Props = RoutePage<Locale, Layout>;
+
+const page = Astro.props;
+const Page = page.component as (props: Record<string, unknown>) => unknown;
+const Shell = page.layout === 'minimal' ? MinimalLayout : BaseLayout;
+---
+
+<Shell page={page}>
+  <Page {...page.props} />
+</Shell>
